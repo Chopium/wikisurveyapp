@@ -1,42 +1,47 @@
-console.log(`loading express`);
 const express = require('express');
-console.log(`fs`);
 const fs = require('fs');
-console.log(`loading pgp`);
-
-const pgp = require('pg-protocol');
-console.log(`loading pg`);
-
 const { Pool } = require('pg');
-
-console.log(`Attempting to load config file`);
-
 const app = express();
+const cors = require('cors');
+app.use(cors());
+
+// Import routers
+console.log("loading api libs...");
+const usersRouter = require('./routes/users');
+// const questionsRouter = require('./routes/questions');
+// const hooksRouter = require('./routes/hooks');
+// const answersRouter = require('./routes/answers');
+// const commentsRouter = require('./routes/comments');
+// const hookResponsesRouter = require('./routes/hook_responses');
+// const votesRouter = require('./routes/votes');
+
+console.log("adding json support for express");
+app.use(express.json());
+
+// Use routers for each resource
+console.log("creating api routes");
+app.use('/users', usersRouter);
+// app.use('/questions', questionsRouter);
+// app.use('/hooks', hooksRouter);
+// app.use('/answers', answersRouter);
+// app.use('/comments', commentsRouter);
+// app.use('/hook_responses', hookResponsesRouter);
+// app.use('/votes', votesRouter);
+
+//environment variables
+console.log("loading environment variables");
 const port = process.env.PORT || 3000;
 const env = process.env.NODE_ENV || 'local';
 
-console.log(`Attempting to load config file`);
-console.log(env);
 // Load config from JSON file
-const config = JSON.parse(fs.readFileSync(`postgres/config/config.${env}.json`, 'utf8'));
-console.log(`Loaded config for environment: ${env}`, config);
-
+console.log(`Attempting to load postgresql config file: ${env}`);
+const config = JSON.parse(fs.readFileSync(`postgres/config.${env}.json`, 'utf8'));
 const pool = new Pool(config.poolConfig);
 
+console.log(`Express now serving public folder`);
 app.use(express.static('public'));
 
-// API endpoint to get a random question
-app.get('/api/question', async (req, res) => {
-    try {
-        console.log('Received request for /api/question');
-        const result = await pool.query('SELECT * FROM questions ORDER BY RANDOM() LIMIT 1');
-        console.log('Fetched question:', result.rows[0]);
-        res.json(result.rows[0]);
-    } catch (err) {
-        console.error('Error fetching question:', err);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+
 
 // Test endpoint
 app.get('/api/test', (req, res) => {

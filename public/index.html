@@ -5,8 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WikiSurvey Landing Page</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="js/WikiSurveyUserApi.js"></script>
 </head>
 <body>
+    <script>
+        const api = new WikiSurveyUserApi('/api');
+        function getCookie(name) {
+            const value = '; ' + document.cookie;
+            const parts = value.split('; ' + name + '=');
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function onParticipateClick() {
+            const userId = getCookie('user_id');
+            if (userId) {
+                window.location.href = 'webapp.html';
+            } else {
+                showModal('cookieWarningModal');
+            }
+        }
+
+        function onCookieWarningModalConfirm() {
+            closeModal('cookieWarningModal');
+            showModal('demographicsModal');
+        }
+
+        function onDemographicsModalConfirm() {
+            const demographicsData = {
+                stakeholders: []
+            };
+
+            const stakeholderInputs = document.querySelectorAll('.stakeholder-input');
+            stakeholderInputs.forEach(input => {
+                if (input.checked) {
+                    demographicsData.stakeholders.push(input.value);
+                }
+            });
+
+            api
+                .createUser(demographicsData)
+                .then((user) => {
+                    console.log('User created:', user);
+                    api.setSessionCookie('user_id', user.id, 1); // Store user ID in a session cookie for 1 day
+                    closeModal('demographicsModal');
+                    window.location.href = 'webapp.html';
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+    </script>
     <header>
         <h1>WikiSurvey</h1>
         <p>Description of the survey and affiliate organizations</p>
@@ -17,9 +75,30 @@
             <p>This is a brief introduction to the survey and its purpose.</p>
             <div class="buttons">
                 <a href="results.html" class="btn">See Results</a>
-                <a href="webapp.html" class="btn">Participate</a>
+                <button class="btn" onclick="onParticipateClick()">Participate</button>
             </div>
         </div>
     </main>
+
+    <div id="cookieWarningModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('cookieWarningModal')">&times;</span>
+            <p>Warning about cookies.</p>
+            <button class="btn" onclick="onCookieWarningModalConfirm()">Confirm</button>
+        </div>
+    </div>
+
+    <div id="demographicsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('demographicsModal')">&times;</span>
+            <p>Select your stakeholder group:</p>
+            <label><input type="checkbox" class="stakeholder-input" value="architects"> Architects</label><br>
+            <label><input type="checkbox" class="stakeholder-input" value="historians"> Historians</label><br>
+            <label><input type="checkbox" class="stakeholder-input" value="public"> The Public</label><br>
+            <label><input type="checkbox" class="stakeholder-input" value="eco-conscious"> Eco-conscious</label><br>
+            <button class="btn" onclick="onDemographicsModalConfirm()">Confirm</button>
+        </div>
+    </div>
+
 </body>
 </html>
