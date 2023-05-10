@@ -15,7 +15,7 @@
             try {
                 const response = await fetch('/api/question');
                 const data = await response.json();
-                document.getElementById('question').innerText = data.question;
+                document.getElementById('question').innerText = data.question-text;
             } catch (err) {
                 console.error(err);
             }
