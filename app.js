@@ -4,7 +4,8 @@ const { Pool } = require('pg');
 const app = express();
 const port = process.env.PORT || 3000;
 const env = process.env.NODE_ENV || 'local';
-
+console.log(`Attempting to load config file`);
+console.log(env);
 // Load config from JSON file
 const config = JSON.parse(fs.readFileSync(`postgres/config/config.${env}.json`, 'utf8'));
 console.log(`Loaded config for environment: ${env}`, config);
