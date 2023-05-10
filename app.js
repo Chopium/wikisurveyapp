@@ -3,7 +3,9 @@ const express = require('express');
 console.log(`fs`);
 const fs = require('fs');
 console.log(`loading pg`);
+require('pg-protocol');
 const { Pool } = require('pg');
+
 console.log(`Attempting to load config file`);
 
 const app = express();
