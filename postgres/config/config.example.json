@@ -1,0 +1,9 @@
+{
+    "poolConfig": {
+      "user": "colterwehmeier",
+      "host": "127.0.0.1",
+      "database": "wikisurvey",
+      "password": "T3chnics",
+      "port": 5432
+    }
+  }
