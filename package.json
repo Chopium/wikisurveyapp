@@ -19,8 +19,6 @@
   },
   "homepage": "https://github.com/Chopium/wikisurveyapp#readme",
   "dependencies": {
-    "express": "^4.18.2",
-    "nodemon": "^2.0.22",
     "pg": "^8.10.0",
     "pg-protocol": "^1.6.0"
   }
